@@ -94,6 +94,12 @@ function areas:canInteract(pos, name)
 	for _, area in pairs(self:getAreasAtPos(pos)) do
 		if area.owner == name or area.open then
 			return true
+		elseif area.privs_open then
+			for priv,_ in pairs(area.privs_open) do
+				if minetest.check_player_privs(name, priv) then
+					return true
+				end
+			end
 		elseif areas.factions_available and area.faction_open then
 			local faction_name = factions.get_player_faction(area.owner)
 			if faction_name ~= nil and faction_name == factions.get_player_faction(name) then

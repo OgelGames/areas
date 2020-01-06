@@ -24,9 +24,16 @@ minetest.register_globalstep(function(dtime)
 			local faction_info = area.faction_open and areas.factions_available and
 					factions.get_player_faction(area.owner)
 			area.faction_open = faction_info
+			local privs = ""
+			if area.privs_open then
+				for priv,_ in pairs(area.privs_open) do
+					privs = privs..":"..priv
+				end
+			end
 			table.insert(areaStrings, ("%s [%u] (%s%s%s)")
 					:format(area.name, id, area.owner,
 					area.open and ":open" or "",
+					area.privs_open and privs or "",
 					faction_info and ":"..faction_info or ""))
 		end
 

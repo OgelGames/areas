@@ -286,6 +286,36 @@ minetest.register_chatcommand("area_open", {
 })
 
 
+minetest.register_chatcommand("area_priv_open", {
+	params = "<ID> <priv>",
+	description = "Opens or closes an area to players with the specific privilege",
+	func = function(name, param)
+		local id, priv = param:match("^(%d+)%s(.+)$")
+		id = tonumber(id)
+		if not id then
+			return false, "Invalid usage, see /help area_priv_open."
+		end
+		if not minetest.registered_privileges[priv] then
+			return false, "Privilege \""..priv.."\" does not exist."
+		end
+		if not areas:isAreaOwner(id, name) then
+			return false, "Area "..id.." does not exist"
+					.." or is not owned by you."
+		end
+
+		local privs = areas.areas[id].privs_open or {}
+		privs[priv] = not privs[priv] or nil
+		local open = true
+		if next(privs) == nil then
+			open = false
+		end
+		-- Save false as nil to avoid inflating the DB.
+		areas.areas[id].privs_open = open and privs or nil
+		areas:save()
+		return true, ("Area %s%s."):format(privs[priv] and "opened" or "closed", open and " to players with the \""..priv.."\" privilege" or "")
+	end
+})
+
 if areas.factions_available then
 	minetest.register_chatcommand("area_faction_open", {
 		params = "<ID>",
