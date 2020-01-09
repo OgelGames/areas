@@ -100,6 +100,16 @@ function areas:canInteract(pos, name)
 					return true
 				end
 			end
+		elseif areas.xp_available and area.xp_open then
+			local xp = xp_redo.get_xp(name)
+			local open = true
+				if area.xp_open.min and xp < area.xp_open.min then
+					open = false
+				end
+				if area.xp_open.max and xp > area.xp_open.max then
+					open = false
+				end
+			if open then return true end
 		elseif areas.factions_available and area.faction_open then
 			local faction_name = factions.get_player_faction(area.owner)
 			if faction_name ~= nil and faction_name == factions.get_player_faction(name) then

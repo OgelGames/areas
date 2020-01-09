@@ -30,10 +30,21 @@ minetest.register_globalstep(function(dtime)
 					privs = privs..":"..priv
 				end
 			end
-			table.insert(areaStrings, ("%s [%u] (%s%s%s)")
+			local xp = ""
+			if areas.xp_available and area.xp_open then
+				if area.xp_open.min and area.xp_open.max then
+					xp = ":"..area.xp_open.min.."-"..area.xp_open.max.."xp"
+				elseif area.xp_open.min then
+					xp = ":"..area.xp_open.min.."+xp"
+				elseif area.xp_open.max then
+					xp = ":<"..area.xp_open.max.."xp"
+				end
+			end
+			table.insert(areaStrings, ("%s [%u] (%s%s%s%s%s)")
 					:format(area.name, id, area.owner,
 					area.open and ":open" or "",
 					area.privs_open and privs or "",
+					area.xp_open and xp or "",
 					faction_info and ":"..faction_info or ""))
 		end
 

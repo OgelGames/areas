@@ -316,6 +316,43 @@ minetest.register_chatcommand("area_priv_open", {
 	end
 })
 
+if areas.xp_available then
+	minetest.register_chatcommand("area_xp_open", {
+		params = "<ID> <min xp> <max xp>",
+		description = "Opens or closes an area to players with the specific privilege",
+		func = function(name, param)
+			local found, _, id, min_xp, max_xp = param:find(
+					"^(-?%d+)[, ](-?%d+)[, ](-?%d+)$")
+			if found then
+				id = tonumber(id)
+				min_xp = tonumber(min_xp)
+				max_xp = tonumber(max_xp)
+			else
+				return false, "Invalid usage, see /help area_xp_open."
+			end
+			if not areas:isAreaOwner(id, name) then
+				return false, "Area "..id.." does not exist"
+						.." or is not owned by you."
+			end
+			if min_xp < 0 or max_xp < 0 then
+				return false, "XP values can not be negative."
+			end
+
+			local xp = areas.areas[id].xp_open or {}
+			xp.min = min_xp > 0 and min_xp or nil
+			xp.max = max_xp > 0 and max_xp or nil
+			local open = true
+			if not xp.min and not xp.max then
+				open = false
+			end
+			-- Save false as nil to avoid inflating the DB.
+			areas.areas[id].xp_open = open and xp or nil
+			areas:save()
+			return true, ("Area %s."):format(open and "opened" or "closed")
+		end
+	})
+end
+
 if areas.factions_available then
 	minetest.register_chatcommand("area_faction_open", {
 		params = "<ID>",
