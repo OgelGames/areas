@@ -94,13 +94,15 @@ function areas:canInteract(pos, name)
 	for _, area in pairs(self:getAreasAtPos(pos)) do
 		if area.owner == name or area.open then
 			return true
-		elseif area.privs_open then
+		end
+		if area.privs_open then
 			for priv,_ in pairs(area.privs_open) do
 				if minetest.check_player_privs(name, priv) then
 					return true
 				end
 			end
-		elseif areas.xp_available and area.xp_open then
+		end
+		if areas.xp_available and area.xp_open then
 			local xp = xp_redo.get_xp(name)
 			local open = true
 				if area.xp_open.min and xp < area.xp_open.min then
@@ -110,7 +112,8 @@ function areas:canInteract(pos, name)
 					open = false
 				end
 			if open then return true end
-		elseif areas.factions_available and area.faction_open then
+		end
+		if areas.factions_available and area.faction_open then
 			local faction_name = factions.get_player_faction(area.owner)
 			if faction_name ~= nil and faction_name == factions.get_player_faction(name) then
 				return true
