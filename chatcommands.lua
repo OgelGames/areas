@@ -337,6 +337,9 @@ if areas.xp_available then
 			if min_xp < 0 or max_xp < 0 then
 				return false, "XP values can not be negative."
 			end
+			if min_xp >= max_xp and not max_xp == 0 then
+				return false, "Maximum XP must be greater than the minimum XP."
+			end
 
 			local xp = areas.areas[id].xp_open or {}
 			xp.min = min_xp > 0 and min_xp or nil
@@ -348,7 +351,15 @@ if areas.xp_available then
 			-- Save false as nil to avoid inflating the DB.
 			areas.areas[id].xp_open = open and xp or nil
 			areas:save()
-			return true, ("Area %s."):format(open and "opened" or "closed")
+			local xp_str = ""
+			if xp.min and xp.max then
+				xp_str = xp.min.." to "..xp.max
+			elseif xp.min then
+				xp_str = "more than "..xp.min
+			elseif xp.max then
+				xp_str = "less than "..xp.max
+			end
+			return true, ("Area %s."):format(open and "opened to players with "..xp_str.." XP" or "closed")
 		end
 	})
 end
